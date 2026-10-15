@@ -63,11 +63,11 @@ Keep `WPORG_APPROVED` unset until WordPress.org has approved the actual plugin a
 
 See https://github.com/10up/action-wordpress-plugin-deploy for the action's prerequisites. After enabling, verify the SVN tag and WordPress.org download/version before reporting publication successful.
 
-## Local validation and remaining blockers
+## Validation and deployment status
 
-Completed: PHP syntax and header/readme version checks; deterministic ZIP contents; stable and RC fixture acceptance; corruption, wrong-commit and unsafe-checksum-path rejection tests; JavaScript syntax check; npm lockfile resolution.
+Local checks cover PHP syntax, version consistency, production ZIP contents, stable/RC fixtures, tampering and wrong-revision rejection, isolated environment mounts, compatibility APIs, and CLI startup. `npm run test:package` requires Docker; CI runs the actual ZIP install, activation and installed-version checks on every push and pull request. See the repository's Actions tab for the result on the commit you are using.
 
-Not completed: Docker startup, mounted plugin behavior, ZIP installation/activation, GitHub CI execution, release publication, downstream mirroring, or SVN deployment. The repository was created by its owner. Docker is absent in the implementation machine’s shell; remote write access and CI results must be verified separately. No secrets or organization permissions have been configured.
+The implementation machine does not have Docker, so the end-to-end installation test runs in GitHub CI. ByteableHub mirroring and WordPress.org deployment remain opt-in until their destination repository, approval, protected environments and secrets are configured. Source commits and successful CI do not imply a published release or a deployed mirror.
 
 The pinned `@wordpress/env` 11.17.0 dependency tree passes `npm audit` with zero reported vulnerabilities after exact overrides for `simple-git` 4.0.2, `js-yaml` 4.3.2 and `qs` 6.16.1. `scripts/wp-env-compat.cjs` adapts wp-env's older callable Git export and YAML safeLoad/safeDump names to the patched APIs. Use the npm scripts (or `npm run wp-env -- ...`) so this adapter is loaded; do not invoke the unwrapped wp-env binary directly. Configuration/YAML round-trip and Git API checks cover the adapter locally; Docker CI verifies the complete workflow. Remove the adapter and overrides when upstream wp-env supports patched dependencies directly. CI and releases reject high/critical audit findings.
 

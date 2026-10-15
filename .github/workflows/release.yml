@@ -46,6 +46,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
         run: |
+          test "$(gh release view --json tagName --jq .tagName)" = "$TAG"
           gh release download "$TAG" --dir dist
           python3 scripts/verify.py dist "$TAG" "$GITHUB_SHA"
           python3 -m zipfile -e "dist/wordpress-plugin-template-${TAG#v}.zip" wporg-build
