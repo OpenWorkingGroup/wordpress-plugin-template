@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "wp-env start",
-    "stop": "wp-env stop",
+    "dev": "node scripts/wp-env.cjs start",
+    "stop": "node scripts/wp-env.cjs stop",
     "build": "python3 scripts/package.py build",
     "test": "python3 scripts/package.py test && python3 -m unittest discover -s tests -v && node scripts/test-config.cjs",
     "zip": "python3 scripts/package.py zip",
-    "test:package": "npm run zip && node scripts/test-package.mjs"
+    "test:package": "npm run zip && node scripts/test-package.mjs",
+    "wp-env": "node scripts/wp-env.cjs"
   },
   "devDependencies": {
     "@wordpress/env": "11.17.0"
@@ -16,5 +17,10 @@
   "engines": {
     "node": ">=24.18.0",
     "npm": ">=11.16.0"
+  },
+  "overrides": {
+    "simple-git": "4.0.2",
+    "qs": "6.16.1",
+    "js-yaml": "4.3.2"
   }
 }

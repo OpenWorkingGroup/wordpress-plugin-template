@@ -1,8 +1,9 @@
 import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const slug = 'wordpress-plugin-template';
-const run = (...args) => execFileSync('npx', ['--no-install', 'wp-env', ...args], { stdio: 'inherit' });
+const run = (...args) => execFileSync(process.execPath, [fileURLToPath(new URL('./wp-env.cjs', import.meta.url)), ...args], { stdio: 'inherit' });
 run('start');
 // Use the dedicated tests installation so the live development mount is untouched.
 run('run', 'tests-cli', 'wp', 'plugin', 'install', `/var/www/html/wp-content/plugin-artifacts/${slug}-${version}.zip`, '--force', '--activate');
