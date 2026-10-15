@@ -1,0 +1,56 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: release
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test && npm run build && npm run test:package
+      - run: python3 scripts/release.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - if: always()
+        run: npm run stop
+  mirror:
+    needs: publish
+    uses: ./.github/workflows/mirror.yml
+    secrets: inherit
+  wordpress:
+    needs: publish
+    if: vars.WPORG_APPROVED == 'true' && !contains(github.ref_name, '-')
+    runs-on: ubuntu-latest
+    environment: wordpress-org
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Download and verify the published ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release download "$TAG" --dir dist
+          python3 scripts/verify.py dist "$TAG" "$GITHUB_SHA"
+          python3 -m zipfile -e "dist/wordpress-plugin-template-${TAG#v}.zip" wporg-build
+      - uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2
+        env:
+          SVN_USERNAME: ${{ secrets.WPORG_SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.WPORG_SVN_PASSWORD }}
+          SLUG: wordpress-plugin-template
+          BUILD_DIR: wporg-build/wordpress-plugin-template

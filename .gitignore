@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.wp-env.override.json
+.env
+__pycache__/

@@ -1,0 +1,20 @@
+{
+  "name": "wordpress-plugin-template",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wp-env start",
+    "stop": "wp-env stop",
+    "build": "python3 scripts/package.py build",
+    "test": "python3 scripts/package.py test && python3 -m unittest discover -s tests -v && node scripts/test-config.cjs",
+    "zip": "python3 scripts/package.py zip",
+    "test:package": "npm run zip && node scripts/test-package.mjs"
+  },
+  "devDependencies": {
+    "@wordpress/env": "11.17.0"
+  },
+  "engines": {
+    "node": ">=24.18.0",
+    "npm": ">=11.16.0"
+  }
+}

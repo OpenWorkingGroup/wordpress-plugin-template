@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    "./plugin/wordpress-plugin-template"
+  ],
+  "phpVersion": "8.2",
+  "mappings": {
+    "wp-content/plugin-artifacts": "./dist"
+  },
+  "env": {
+    "tests": {
+      "plugins": []
+    }
+  }
+}
